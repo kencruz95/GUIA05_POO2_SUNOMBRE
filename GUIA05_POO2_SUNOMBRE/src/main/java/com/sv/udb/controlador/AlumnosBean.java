@@ -7,6 +7,7 @@ package com.sv.udb.controlador;
 
 import com.sv.udb.modelo.Alumnos;
 import java.io.Serializable;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
@@ -25,6 +26,7 @@ import org.primefaces.context.RequestContext;
 @ViewScoped
 public class AlumnosBean implements Serializable{
     private Alumnos objeAlum;
+    private List<Alumnos> listAlum;
     private boolean guardar;
 
     public Alumnos getObjeAlum() {
@@ -37,6 +39,10 @@ public class AlumnosBean implements Serializable{
 
     public boolean isGuardar() {
         return guardar;
+    }
+
+    public List<Alumnos> getListAlum() {
+        return listAlum;
     }
     
     /**
@@ -51,8 +57,14 @@ public class AlumnosBean implements Serializable{
     {
         this.objeAlum = new Alumnos();
         this.guardar = true;
+        this.consTodo();
     }
-    
+    public void limpForm()
+    {
+        System.err.println("entyra");
+        this.objeAlum = new Alumnos();
+        this.guardar = true;        
+    }
     public void guar()
     {
         RequestContext ctx = RequestContext.getCurrentInstance(); //Capturo el contexto de la página
@@ -65,13 +77,32 @@ public class AlumnosBean implements Serializable{
             em.persist(this.objeAlum);
             tx.commit();
             this.guardar = true;
+            this.listAlum.add(this.objeAlum); //Agrega el objeto a la lista para poderse mostrar en tabla
             this.objeAlum = new Alumnos(); // Limpiar
             ctx.execute("setMessage('MESS_SUCC', 'Atención', 'Datos guardados')");
         }
         catch(Exception ex)
         {
-            ctx.execute("setMessage('MESS_ERRO', 'Atención', 'Error')");
+            ctx.execute("setMessage('MESS_ERRO', 'Atención', 'Error al guardar ')");
             tx.rollback();
+        }
+        finally
+        {
+            em.close();
+            emf.close();            
+        }
+    }
+    
+    public void consTodo()
+    {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("POOPU");
+        EntityManager em = emf.createEntityManager();
+        try
+        {
+            this.listAlum = em.createNamedQuery("Alumnos.findAll", Alumnos.class).getResultList();
+        }
+        catch(Exception ex)
+        {
             ex.printStackTrace();
         }
         finally
