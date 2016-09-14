@@ -153,5 +153,40 @@ and open the template in the editor.
                 </div>
             </div>
         </div>
+        <div class="row col-md-12">
+            <div class="col-md-4 col-xs-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Formulario</div>
+                    <div class="panel-body">
+                        <h:form id="FormGrupAlum">
+                            <h:inputHidden id="codi" value="#{gruposAlumnosBean.objeGrupAlum.codiGrupAlum}" />
+                            <div class="input-group input-group-xs">
+                                <h:outputLabel  for="gene" value="Género: "/>
+                                <h:selectOneMenu id="gene" converter="DemoConv" value="#{gruposAlumnosBean.objeGrupAlum.codiAlum}" class="form-control">
+                                    <f:selectItems value="#{alumnosBean.listAlum}" var="list" itemLabel="#{list.nombAlum}" itemValue="#{list}"/>
+                                    <f:converter converterId="DemoConv"/>
+                                </h:selectOneMenu>
+                                <h:message for="gene" errorClass="field-error" />
+                            </div>
+                            <div class="input-group-btn right" style="padding-top: 5px;">
+                                <div class="btn-group">
+                                    <h:commandLink id="btonGuar" class="btn btn-success btn-xs">
+                                        <p:ajax listener="#{gruposAlumnosBean.guar()}" process="@form" update="@form"/>
+                                        <i class="fa fa-plus"/> Guardar
+                                    </h:commandLink>
+                                </div>
+                            </div>
+                        </h:form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8 col-xs-8">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Tabla de Datos</div>
+                    <div class="panel-body">
+                    </div>
+                </div>
+            </div>
+        </div>
     </h:body>
 </html>
