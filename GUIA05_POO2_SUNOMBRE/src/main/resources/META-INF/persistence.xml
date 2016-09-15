@@ -3,6 +3,8 @@
   <persistence-unit name="POOPU" transaction-type="JTA">
     <jta-data-source>jdbc/PooPool</jta-data-source>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
-    <properties/>
+    <properties>
+        <property name="javax.persistence.validation.mode" value="AUTO" />
+    </properties>
   </persistence-unit>
 </persistence>

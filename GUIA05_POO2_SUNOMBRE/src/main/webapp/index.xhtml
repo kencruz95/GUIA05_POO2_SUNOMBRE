@@ -28,6 +28,9 @@ and open the template in the editor.
         <h:outputStylesheet library="css" name="custom/table.mini.css" />
         <h:outputScript library="js" name="bootstrap-table.js" />
         <h:outputScript library="js" name="bootstrap-table-es-AR.min.js" />
+        <!--Plugins Confirmation [Eliminar]-->
+        <h:outputScript library="js" name="bootstrap-tooltip.js"/>
+        <h:outputScript library="js" name="bootstrap-confirmation.js"/>
         <!--Plugins Exclusivos de esta página-->
         <h:outputScript library="js" name="custom/alum.js"/>
         
@@ -51,6 +54,12 @@ and open the template in the editor.
                 <div class="panel panel-default">
                     <div class="panel-heading">Formulario</div>
                     <div class="panel-body">
+                        <h:form>
+                            <!--Form exclusivo para los remotos-->
+                            <p:remoteCommand name="consAlum" actionListener="#{alumnosBean.cons()}" update=":FormAlum" 
+                                             oncomplete="INIT_OBJE_ALUM();" global="true"/>
+                            <p:remoteCommand name="elimAlum" actionListener="#{alumnosBean.elim()}" update=":FormAlum :ContAlum" oncomplete="INIT_OBJE_ALUM();" />
+                        </h:form>
                         <h:form id="FormAlum">
                             <h:inputHidden id="codi" value="#{alumnosBean.objeAlum.codiAlum}" />
                             <div class="input-group input-group-xs">
@@ -96,11 +105,24 @@ and open the template in the editor.
                             </div>
                             <div class="input-group-btn right" style="padding-top: 5px;">
                                 <div class="btn-group">
-                                    <h:commandLink id="btonGuar" class="btn btn-success btn-xs">
-                                        <p:ajax listener="#{alumnosBean.guar()}" process="@form" update="@form :ContAlum" oncomplete="INIT_OBJE_ALUM();"
-                                                immediate="true"/>
+                                    <h:commandLink id="btonCanc" class="btn btn-default btn-xs">
+                                        <p:ajax listener="#{alumnosBean.limpForm()}" process="@form" update="@form" global="true"/>
+                                        <i class="fa fa-mail-forward"/> Cancelar
+                                    </h:commandLink>
+                                    <h:commandLink id="btonGuar" class="btn btn-success btn-xs" rendered="#{alumnosBean.guardar}">
+                                        <p:ajax listener="#{alumnosBean.guar()}" process="@form" update="@form :ContAlum" oncomplete="INIT_OBJE_ALUM();" />
                                         <i class="fa fa-plus"/> Guardar
                                     </h:commandLink>
+                                    <h:commandLink id="btonModi" class="btn btn-primary btn-xs" rendered="#{!alumnosBean.guardar}">
+                                        <p:ajax listener="#{alumnosBean.modi()}" process="@form" update="@form :ContAlum" oncomplete="INIT_OBJE_ALUM();" />
+                                        <i class="fa fa-edit"/> Modificar
+                                    </h:commandLink>
+                                    <h:outputLink id="btonElim" class="btn btn-danger btn-xs" rendered="#{!alumnosBean.guardar}" 
+                                        pt:data-toggle="confirmation" pt:data-btn-ok-label="Sí" pt:data-btn-ok-icon="fa fa-times"
+                                        pt:data-btn-ok-class="btn-danger btn-xs" pt:data-btn-cancel-label="No" pt:data-btn-cancel-icon="fa fa-mail-forward"
+                                        pt:data-btn-cancel-class="btn-default btn-xs" pt:data-title="¿Esta seguro que desea eliminar?">
+                                        <i class="fa fa-times"/> Eliminar
+                                    </h:outputLink>
                                 </div>
                             </div>
                         </h:form>
@@ -113,77 +135,42 @@ and open the template in the editor.
                     <div class="panel-body">
                         <h:panelGroup id="ContAlum">
                             <h:dataTable pt:data-id="TablAlum" id="TablAlum" value="#{alumnosBean.listAlum}"
-                                                 var="fila" class="boottable" pt:data-toolbar="#toolbar"
-                                                 styleClass="table-hover table-bordered table-condensed table-striped table-responsive"
-                                                 pt:data-show-refresh="false" pt:data-show-toggle="false" pt:data-show-columns="false" 
-                                                 pt:data-search="true" pt:data-pagination="true" pt:data-page-list="[5, 10, 20, 50]"
-                                                 pt:data-click-to-select="true"  pt:data-select-item-name="radio"
-                                                 pt:data-single-select="true">                                
-                                        <h:column pt:data-field="state" pt:data-checkbox="true">
-                                        </h:column>
-                                        <h:column pt:data-align="right" pt:data-sortable="true" pt:data-field="id">
-                                            <f:facet name="header">Código</f:facet>
-                                            <h:outputText value="#{fila.codiAlum}"/>
-                                        </h:column>
-                                        <h:column pt:data-sortable="true" pt:data-field="nomb">
-                                            <f:facet name="header">Nombre</f:facet>
-                                            <h:outputText value="#{fila.nombAlum.concat(' ').concat(fila.apelAlum)}"/>   
-                                        </h:column>
-                                        <h:column pt:data-sortable="true">
-                                            <f:facet name="header">Fecha Nac.</f:facet>
-                                            <h:outputText value="#{fila.fechNaciAlum}">
-                                                <f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6"/>
-                                            </h:outputText>                            
-                                        </h:column>
-                                        <h:column pt:data-sortable="true">
-                                            <f:facet name="header">Email</f:facet>
-                                            <h:outputText value="#{fila.mailAlum}"/>
-                                        </h:column>
-                                        <h:column pt:data-sortable="true">
-                                            <f:facet name="header">Teléfono</f:facet> 
-                                            <h:outputText value="#{fila.teleAlum}"/>
-                                        </h:column>
-                                        <h:column pt:data-sortable="true">
-                                            <f:facet name="header">Dirección</f:facet> 
-                                            <h:outputText value="#{fila.direAlum}"/>
-                                        </h:column>
-                                    </h:dataTable>
+                                        var="fila" class="boottable" pt:data-toolbar="#toolbar"
+                                        styleClass="table-hover table-bordered table-condensed table-striped table-responsive"
+                                        pt:data-show-refresh="false" pt:data-show-toggle="false" pt:data-show-columns="false" 
+                                        pt:data-search="true" pt:data-pagination="true" pt:data-page-list="[5, 10, 20, 50]"
+                                        pt:data-click-to-select="true"  pt:data-select-item-name="radio"
+                                        pt:data-single-select="true">                                
+                               <h:column pt:data-field="state" pt:data-checkbox="true">
+                               </h:column>
+                               <h:column pt:data-align="right" pt:data-sortable="true" pt:data-field="id">
+                                   <f:facet name="header">Código</f:facet>
+                                   <h:outputText value="#{fila.codiAlum}"/>
+                               </h:column>
+                               <h:column pt:data-sortable="true" pt:data-field="nomb">
+                                   <f:facet name="header">Nombre</f:facet>
+                                   <h:outputText value="#{fila.nombAlum.concat(' ').concat(fila.apelAlum)}"/>   
+                               </h:column>
+                               <h:column pt:data-sortable="true">
+                                   <f:facet name="header">Fecha Nac.</f:facet>
+                                   <h:outputText value="#{fila.fechNaciAlum}">
+                                       <f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6"/>
+                                   </h:outputText>                            
+                               </h:column>
+                               <h:column pt:data-sortable="true">
+                                   <f:facet name="header">Email</f:facet>
+                                   <h:outputText value="#{fila.mailAlum}"/>
+                               </h:column>
+                               <h:column pt:data-sortable="true">
+                                   <f:facet name="header">Teléfono</f:facet> 
+                                   <h:outputText value="#{fila.teleAlum}"/>
+                               </h:column>
+                               <h:column pt:data-sortable="true">
+                                   <f:facet name="header">Dirección</f:facet> 
+                                   <h:outputText value="#{fila.direAlum}"/>
+                               </h:column>
+                           </h:dataTable>
                         </h:panelGroup>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row col-md-12">
-            <div class="col-md-4 col-xs-4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Formulario</div>
-                    <div class="panel-body">
-                        <h:form id="FormGrupAlum">
-                            <h:inputHidden id="codi" value="#{gruposAlumnosBean.objeGrupAlum.codiGrupAlum}" />
-                            <div class="input-group input-group-xs">
-                                <h:outputLabel  for="gene" value="Género: "/>
-                                <h:selectOneMenu id="gene" converter="DemoConv" value="#{gruposAlumnosBean.objeGrupAlum.codiAlum}" class="form-control">
-                                    <f:selectItems value="#{alumnosBean.listAlum}" var="list" itemLabel="#{list.nombAlum}" itemValue="#{list}"/>
-                                    <f:converter converterId="DemoConv"/>
-                                </h:selectOneMenu>
-                                <h:message for="gene" errorClass="field-error" />
-                            </div>
-                            <div class="input-group-btn right" style="padding-top: 5px;">
-                                <div class="btn-group">
-                                    <h:commandLink id="btonGuar" class="btn btn-success btn-xs">
-                                        <p:ajax listener="#{gruposAlumnosBean.guar()}" process="@form" update="@form"/>
-                                        <i class="fa fa-plus"/> Guardar
-                                    </h:commandLink>
-                                </div>
-                            </div>
-                        </h:form>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-8 col-xs-8">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Tabla de Datos</div>
-                    <div class="panel-body">
                     </div>
                 </div>
             </div>
