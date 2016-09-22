@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-@FacesConverter("DemoConv")
+@FacesConverter("PooConv")
 public class JsfUniversalConverter implements Converter, Serializable {
 	/**
 	 * Serial de la clase

@@ -55,8 +55,7 @@ public class AlumnosBean implements Serializable{
     @PostConstruct
     public void init()
     {
-        this.objeAlum = new Alumnos();
-        this.guardar = true;
+        this.limpForm();
         this.consTodo();
     }
     
